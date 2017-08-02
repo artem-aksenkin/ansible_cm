@@ -1,0 +1,82 @@
+---
+- hosts: all
+  vars:
+    java_version: java-1.8.0-openjdk.x86_64
+    tomcat_version: 8.5.16
+    http_port: 8080
+    https_port: 8443
+    admin_username: admin
+    admin_password: tomcat
+  
+  become: True
+  become_method: sudo
+
+  tasks:
+
+  - name: Install Java 1.8
+    yum: name={{java_version}} state=present
+    
+  - name: add group "tomcat"
+    group: name=tomcat
+    
+  - name: add user "tomcat"
+    user: name=tomcat group=tomcat home=/usr/share/tomcat createhome=no
+ 
+  - name: preparing for Tomcat landing
+    shell: | 
+      mkdir -p /opt/tomcat/{{tomcat_version}} 
+      chown -R tomcat:tomcat /opt/tomcat/{{tomcat_version}}
+
+  - name: Download Tomcat
+    get_url: url=http://ftp.byfly.by/pub/apache.org/tomcat/tomcat-8/v{{tomcat_version}}/bin/apache-tomcat-{{tomcat_version}}.tar.gz dest=/opt/tomcat/apache-tomcat-{{tomcat_version}}.tar.gz
+
+
+  - name: Unarchive Tomcat
+    unarchive:
+      src: /opt/tomcat/apache-tomcat-{{tomcat_version}}.tar.gz
+      dest: /home/vagrant/
+      remote_src: yes
+
+  - name: Copy Tomcat to destination location
+    shell: |
+      cp -R /home/vagrant/apache-tomcat-{{tomcat_version}}/* /opt/tomcat/{{tomcat_version}}
+      chown -R tomcat:tomcat /opt/tomcat/{{tomcat_version}}
+
+  - name: Install Tomcat unit script
+    copy: src=tomcat.service dest=/etc/systemd/system/tomcat.service mode=0755
+
+  - name: ensure Tomcat is running (and enable it at boot)
+    service: name=tomcat state=started enabled=yes
+
+  - name: wait for tomcat to start
+    wait_for: port={{http_port}}
+    delegate_to: localhost
+
+- name: Checks for running
+  hosts: default
+
+  tasks:
+
+   - name: Check http response status
+     shell: curl -LI http://127.0.0.1:8088
+
+   - name : Check Tomcat service
+     shell: systemctl status tomcat
+
+   - name: Process existing check
+     shell: ps -ef | grep tomcat
+
+   - uri:
+       url: http://127.0.0.1:8080
+       return_content: yes
+     register: webpage
+
+   - name: Fail if Tomcat is not in the page content
+     fail:
+       msg: 'Fail "Tomcat" is not in the page content'
+     when: "'Tomcat' not in webpage.content"
+
+
+
+  
+

@@ -1,0 +1,6 @@
+---
+# defaults file for roles/tomcat/
+tomcat_version: 8.5.16
+tomcat_home: "/opt/tomcat/"
+http_port: 8080
+hash_md5: ed752991f01e270ccfc7b4e8686f4f3c

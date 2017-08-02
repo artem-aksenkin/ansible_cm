@@ -1,0 +1,9 @@
+---
+- name: apply common config for app servers
+  hosts: default
+  become: yes
+  become_method: sudo
+  roles:
+    - java
+    - tomcat
+    - nginx

@@ -1,0 +1,41 @@
+---
+# tasks file for roles/tomcat/
+
+
+- name: add group "tomcat"
+  group: name=tomcat
+
+- name: add user "tomcat"
+  user: name=tomcat group=tomcat home=/usr/share/tomcat createhome=no
+
+- name: preparing for Tomcat landing
+  shell: |
+    mkdir -p {{tomcat_end}}
+    chown -R tomcat:tomcat {{tomcat_end}}
+
+- name: Download Tomcat
+  get_url:
+   url: "{{tomcat_url}}"
+   dest: /tmp/{{tomcat_version}}.tar.gz
+   checksum: md5:{{hash_md5}}
+
+- name: Unarchive Tomcat
+  unarchive:
+    src: /tmp/{{tomcat_version}}.tar.gz
+    dest: /home/vagrant/
+    remote_src: yes
+
+- name: Copy Tomcat to destination location
+  shell: |
+    cp -R /home/vagrant/apache-tomcat-{{tomcat_version}}/* {{tomcat_end}}
+    chown -R tomcat:tomcat /opt/tomcat/{{tomcat_version}}/
+
+- name: Install Tomcat unit script
+  template: src=tomcat.service.j2d dest=/etc/systemd/system/tomcat.service mode=0755
+
+- name: ensure Tomcat is running (and enable it at boot)
+  service: name=tomcat state=started enabled=yes
+
+- name: wait for tomcat to start
+  wait_for: port={{http_port}}
+  delegate_to: localhost
