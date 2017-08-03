@@ -2,11 +2,11 @@
 # tasks file for roles/tomcat/
 
 
-- name: add group "tomcat"
-  group: name=tomcat
+- name: add group
+  group: name={{tomcat_group}}
 
-- name: add user "tomcat"
-  user: name=tomcat group=tomcat home=/usr/share/tomcat createhome=no
+- name: add user
+  user: name={{tomcat_user}} group={{tomcat_group}} home=/usr/share/{{tomcat_user}} createhome=no
 
 - name: preparing for Tomcat landing
   shell: |
@@ -32,6 +32,7 @@
 
 - name: Install Tomcat unit script
   template: src=tomcat.service.j2d dest=/etc/systemd/system/tomcat.service mode=0755
+  notify: systemd reload
 
 - name: ensure Tomcat is running (and enable it at boot)
   service: name=tomcat state=started enabled=yes
