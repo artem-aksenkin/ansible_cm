@@ -1,3 +1,7 @@
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+from ansible import errors
+import re
 
 def get_mongo_src(args, os_family, os_ver, mongo_ver):
     result = []
