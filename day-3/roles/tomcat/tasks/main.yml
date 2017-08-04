@@ -37,11 +37,6 @@
 - name: ensure Tomcat is running (and enable it at boot)
   service: name=tomcat state=started enabled=yes
 
-
-- name: Configure Tomcat server
-  template: src=server.xml.j2d dest={{ tomcat_end  }}/conf/server.xml
-  notify: systemd reload
-
 - name: Configure Tomcat users
   template: src=tomcat-users.xml.j2d dest={{ tomcat_end  }}/conf/tomcat-users.xml
   notify: systemd reload
