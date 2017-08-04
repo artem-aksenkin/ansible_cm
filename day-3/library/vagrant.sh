@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+
 function vagrant_up
 	{
 		if [ $(ls $dest | grep Vagrantfile) ] || [ -f "$dest" ]  ;  then
@@ -15,7 +16,7 @@ function vagrant_up
 				printf '{"failed": true, "changed": false, "ip": "%s", "port": "%s", "user": "%s", "key": "%s", "status": "%s", "os_name": "%s", "ram": "%s"}' "$ip" "$port" "$user" "$key" "$status" "$os_name" "$ram"
 				exit 1
 			fi
-		elsebbb
+		else
 			printf '{"failed": true, "msg": "missing vagrant file at destination"}'
 			exit 1
 		fi
@@ -67,12 +68,11 @@ function vagrant_ssh_config
 source $1
 
 if [ -z "$dest" ]; then
-	printf '{"failed": true, "msg": "missing required arguments: dest"}'
+	printf '{"failed": true, "msg": "missing required arguments: dest"\n}'
 	exit 1
 fi
 
 if [ -z "$state" ]; then
-	printf '{"failed": true, "msg": "missing required arguments: state"}'
 	exit 1
 fi
 
@@ -91,7 +91,7 @@ case $state in
 		vagrant_ssh_config
 	;;
 	*)
-		printf '{"failed": true, "msg": "invalid state selected {started | stopped | destroyed}"}'
+		printf '{"failed": true, "msg": "invalid state selected {started | stopped | destroyed}"\n}'
 		exit 1
 	;;
 esac

@@ -11,3 +11,6 @@
 - name: nginx service state
   service: name=nginx state=started enabled=yes
 
+- name: wait for nginx to start
+  wait_for: port={{nginx_port}}
+  delay: 10
