@@ -1,0 +1,3 @@
+[java]
+java_version: {{java_version}}
+java_state: installed

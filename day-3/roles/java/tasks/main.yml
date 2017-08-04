@@ -1,0 +1,24 @@
+---
+# tasks file for roles/
+
+- name: precondition - java_version
+  fail: msg="ERROR - required variable 'java_version' missing."
+  when: java_version is not defined
+
+- name: Install Java
+  yum: name={{java_version}} state=present
+
+- name: Check for output of Java
+  shell: java -version
+  register: output
+- debug: var=output.stderr_lines
+
+- name: set fact dir
+  file:
+    path: /etc/ansible/facts.d/
+    state: directory
+    mode: 0755
+
+- name: set fact
+  template: src=java.fact.j2d dest=/etc/ansible/facts.d/java.fact mode=0755
+
