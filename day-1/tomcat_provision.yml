@@ -50,7 +50,6 @@
 
   - name: wait for tomcat to start
     wait_for: port={{http_port}}
-    delegate_to: localhost
 
 - name: Checks for running
   hosts: default
@@ -58,7 +57,7 @@
   tasks:
 
    - name: Check http response status
-     shell: curl -LI http://127.0.0.1:8088
+     shell: curl -LI http://127.0.0.1:8080
 
    - name : Check Tomcat service
      shell: systemctl status tomcat
