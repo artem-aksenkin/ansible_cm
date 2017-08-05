@@ -28,3 +28,6 @@
   - java
   - tomcat
   - nginx
+  roles:
+  - deploy
+  tags: deploy_app
